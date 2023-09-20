@@ -89,7 +89,7 @@ if __name__ == '__main__':
     if not show_choropleth:
         choropleth.layer_name = None
 
-    st_folium(map_my)
+    #st_folium(map_my)
 
     map_my.save('itp_area_map.html')
     p = open('itp_area_map.html')
