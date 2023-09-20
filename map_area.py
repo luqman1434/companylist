@@ -102,7 +102,8 @@ if __name__ == '__main__':
     #         marker.add_to(map_my)
     #         marker.add_child(folium.ClickForMarker(popup=update_sidebar))
     
-    text_load_state.text('Plotting ... Done!')
+    text_load_state.text('Plottin ... Done!')
+
 
     map_my.save('itp_area_map.html')
     # p = open('itp_area_map.html')
