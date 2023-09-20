@@ -12,9 +12,6 @@ import streamlit as st
 import streamlit.components.v1 as components
 from streamlit_folium import st_folium
 
-# Import the sidebar function from sidebar.py
-from sidebar import sidebar
-
 # 3.16000, 101.71000 : Kuala Lumpur
 
 def read_file(filename, sheetname):
@@ -25,21 +22,16 @@ def read_file(filename, sheetname):
 
 if __name__ == '__main__':
     st.title('Available ITP companies in Malaysia')
-    # Call the sidebar function to include it in your app
-    sidebar()
-
-    # Create an empty space in the sidebar to display company information
-    company_info_container = st.empty()
 
     file_input = 'MMU ITP List 13_9_9_11.xlsx'
     geojson_file = "msia_district.geojson"
 
     text_load_state = st.text('Reading files ...')
-    with open(geojson_file) as gj_f:
+    with open(geojson_file, encoding='utf-8', errors='ignore') as gj_f:
         geojson_data = gpd.read_file(gj_f)
 
     itp_list_state = read_file(file_input, 0)
-    text_load_state.text('Reading files ... Done!')
+    text_load_state.text('Reading files ... Done!') 
 
     map_size = Figure(width=800, height=600)
     map_my = folium.Map(location=[4.2105, 108.9758], zoom_start=6)
@@ -83,27 +75,9 @@ if __name__ == '__main__':
         popup_name = '<strong>' + str(itp_data['Company name']) + '</strong>\n' + str(itp_data['Company address'])
         if not math.isnan(latitude) and not math.isnan(longitude):
             folium.Marker(location=[latitude, longitude], popup=popup_name, tooltip=company_name).add_to(map_my)
-    # for itp_data in itp_list_state.to_dict(orient='records'):
-    #     latitude = itp_data['map_latitude']
-    #     longitude = itp_data['map_longitude']
-    #     company_name = itp_data['Company name']
-    #     company_address = itp_data['Company address']
-    #     popup_name = '<strong>' + str(company_name) + '</strong>\n' + str(company_address)
-    #     if not math.isnan(latitude) and not math.isnan(longitude):
-    #         marker = folium.Marker(location=[latitude, longitude], popup=popup_name, tooltip=company_name)
-    #         marker.add_to(map_my)
-
-    #         # Create a function to update the sidebar with company information when marker is clicked
-    #         def update_sidebar(marker=marker, company_info_container=company_info_container):
-    #             company_info_container.write(f"**Company Name:** {company_name}")
-    #             company_info_container.write(f"**Company Address:** {company_address}")
-
-    #         # Add a click event to the marker
-    #         marker.add_to(map_my)
-    #         marker.add_child(folium.ClickForMarker(popup=update_sidebar))
     
     text_load_state.text('Plotting ... Done!')
-############################
+
     # Manually specify the states for checkboxes
     selected_states = st.multiselect("Select States", merged_gdf['NAME_1'].unique())
 
@@ -117,11 +91,6 @@ if __name__ == '__main__':
 
     st_folium(map_my)
 
-#############################
     map_my.save('itp_area_map.html')
-    # p = open('itp_area_map.html')
-    p = open('itp_area_map.html', 'r', encoding='utf-8')
-    components.html(p.read(), 1000, 600)
-
-
-#python -m streamlit run map_area.py
+    p = open('itp_area_map.html')
+    components.html(p.read(), 800, 480)
