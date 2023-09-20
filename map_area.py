@@ -104,15 +104,8 @@ if __name__ == '__main__':
     
     text_load_state.text('Plotting ... Done!')
 ############################
-    # Get a list of all unique states from the data
-    all_states = merged_gdf['NAME_1'].unique()
-
-    # Create a dictionary to hold the state checkboxes
-    state_checkboxes = {}
-    for state in all_states:
-        state_checkboxes[state] = st.checkbox(f"Show {state}")
-
-    selected_states = [state for state, checkbox_value in state_checkboxes.items() if checkbox_value] 
+    # Manually specify the states for checkboxes
+    selected_states = st.multiselect("Select States", merged_gdf['NAME_1'].unique())
 
     if selected_states:
         merged_gdf = merged_gdf[merged_gdf['NAME_1'].isin(selected_states)]
@@ -121,6 +114,7 @@ if __name__ == '__main__':
 
     if not show_choropleth:
         choropleth.layer_name = None
+
     st_folium(map_my)
 
 #############################
