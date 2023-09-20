@@ -102,9 +102,28 @@ if __name__ == '__main__':
     #         marker.add_to(map_my)
     #         marker.add_child(folium.ClickForMarker(popup=update_sidebar))
     
-    text_load_state.text('Plottin ... Done!')
+    text_load_state.text('Plotting ... Done!')
+############################
+    # Get a list of all unique states from the data
+    all_states = merged_gdf['NAME_1'].unique()
 
+    # Create a dictionary to hold the state checkboxes
+    state_checkboxes = {}
+    for state in all_states:
+        state_checkboxes[state] = st.checkbox(f"Show {state}")
 
+    selected_states = [state for state, checkbox_value in state_checkboxes.items() if checkbox_value] 
+
+    if selected_states:
+        merged_gdf = merged_gdf[merged_gdf['NAME_1'].isin(selected_states)]
+
+    show_choropleth = st.checkbox("Toggle Choropleth Layer")
+
+    if not show_choropleth:
+        choropleth.layer_name = None
+    st_folium(map_my)
+
+#############################
     map_my.save('itp_area_map.html')
     # p = open('itp_area_map.html')
     p = open('itp_area_map.html', 'r', encoding='utf-8')
