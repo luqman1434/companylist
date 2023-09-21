@@ -68,6 +68,13 @@ if __name__ == '__main__':
     folium.GeoJsonTooltip(fields=['NAME_1','NAME_2', 'count'], aliases=['State','District', 'Count']).add_to(choropleth.geojson)
 
     text_load_state.text('Plotting ...')
+
+    # Manually specify the states for checkboxes
+    selected_states = st.multiselect("Select States", merged_gdf['NAME_1'].unique())
+
+    if selected_states:
+        merged_gdf = merged_gdf[merged_gdf['NAME_1'].isin(selected_states)]
+
     for itp_data in itp_list_state.to_dict(orient='records'):
         latitude = itp_data['map_latitude']
         longitude = itp_data['map_longitude']
@@ -78,18 +85,12 @@ if __name__ == '__main__':
     
     text_load_state.text('Plotting ... Done!')
 
-    # Manually specify the states for checkboxes
-    selected_states = st.multiselect("Select States", merged_gdf['NAME_1'].unique())
-
-    if selected_states:
-        merged_gdf = merged_gdf[merged_gdf['NAME_1'].isin(selected_states)]
-
     show_choropleth = st.checkbox("Toggle Choropleth Layer")
 
     if not show_choropleth:
         choropleth.layer_name = None
 
-    #st_folium(map_my)
+    st_folium(map_my)
 
     map_my.save('itp_area_map.html')
     p = open('itp_area_map.html')
