@@ -81,17 +81,16 @@ if __name__ == '__main__':
     show_choropleth = st.checkbox("Toggle Choropleth Layer")
 
     if not show_choropleth:
-       for layer in map_my._children:
-          if isinstance(layer, folium.Map) and layer.get_name() == 'choropleth':
-              layer.add_child(folium.Popup("Click me to toggle the Choropleth Layer", show=True))
-          elif isinstance(layer, folium.Popup) and "Click me to toggle the Choropleth Layer" in layer.get_name():
-              layer.add_to(map_my)
-          elif isinstance(layer, folium.Layer) and "choropleth" in layer.get_name():
-              layer.add_to(map_my)
+        for layer in map_my._children:
+            if isinstance(layer, folium.Map) and layer.get_name() == 'choropleth':
+                layer.add_child(folium.Popup("Click me to toggle the Choropleth Layer", show=True))
+            elif isinstance(layer, folium.Popup) and "Click me to toggle the Choropleth Layer" in layer.get_name():
+                layer.add_to(map_my)
+            elif isinstance(layer, folium.Layer) and "choropleth" in layer.get_name():
+                layer.add_to(map_my)
 
     st_folium(map_my)
 
     map_my.save('itp_area_map.html')
     p = open('itp_area_map.html')
     components.html(p.read(), 800, 480)
-
