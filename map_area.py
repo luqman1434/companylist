@@ -27,7 +27,7 @@ if __name__ == '__main__':
     geojson_file = "msia_district.geojson"
 
     text_load_state = st.text('Reading files ...')
-    with open(geojson_file,encoding='utf-8', errors='ignore') as gj_f:
+    with open(geojson_file, encoding='utf-8', errors='ignore') as gj_f:
         geojson_data = gpd.read_file(gj_f)
 
     itp_list_state = read_file(file_input, 0)
@@ -77,6 +77,12 @@ if __name__ == '__main__':
             folium.Marker(location=[latitude, longitude], popup=popup_name, tooltip=company_name).add_to(map_my)
     
     text_load_state.text('Plotting ... Done!')
+
+    # Manually specify the states for checkboxes
+    selected_states = st.multiselect("Select States", merged_gdf['NAME_1'].unique())
+
+    if selected_states:
+        merged_gdf = merged_gdf[merged_gdf['NAME_1'].isin(selected_states)]
 
     show_choropleth = st.checkbox("Toggle Choropleth Layer")
 
