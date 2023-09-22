@@ -20,8 +20,26 @@ def read_file(filename, sheetname):
 
     return data_d
 
+st.set_page_config(
+    page_title="Available ITP companies in Malaysia",
+    #page_icon="🗺️",
+    layout="wide",
+    initial_sidebar_state="collapsed",
+    )
+
+# Add custom CSS to set background color
+st.markdown(
+    """
+    <style>
+        body {
+            background-color: #FFFFFF; /* Set to white (#FFFFFF) */
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 if __name__ == '__main__':
-    st.title('Available ITP companies in Malaysia')
+    #st.title('Available ITP companies in Malaysia')
 
     file_input = 'MMU ITP List 13_9_9_11.xlsx'
     geojson_file = "msia_district.geojson"
