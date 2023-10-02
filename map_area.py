@@ -82,7 +82,7 @@ if __name__ == '__main__':
 
     # Filter the data based on selected states
     if selected_states:
-        merged_gdf = merged_gdf[merged_gdf['NAME_1'].isin(selected_states)]
+        filtered_gdf = merged_gdf[merged_gdf['NAME_1'].isin(selected_states)]
         plot_choropleth(map_my)
 
     text_load_state.text('Plotting ... Done!')
