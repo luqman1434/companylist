@@ -81,13 +81,21 @@ if __name__ == '__main__':
     # Manually specify the states for checkboxes
     selected_states = st.multiselect("Select States", merged_gdf['NAME_1'].unique())
 
-    if selected_states:
-        merged_gdf = merged_gdf[merged_gdf['NAME_1'].isin(selected_states)]
+    #####if selected_states:
+     #   merged_gdf = merged_gdf[merged_gdf['NAME_1'].isin(selected_states)
+    #show_choropleth = st.checkbox("Toggle Choropleth Layer")
 
-    show_choropleth = st.checkbox("Toggle Choropleth Layer")
+    ##if not show_choropleth:
+        #choropleth.layer_name = None
 
     if not show_choropleth:
-        choropleth.layer_name = None
+        for layer in map_my._children:
+            if isinstance(layer, folium.Map) and layer.get_name() == 'choropleth':
+                layer.add_child(folium.Popup("Click me to toggle the Choropleth Layer", show=True))
+            elif isinstance(layer, folium.Popup) and "Click me to toggle the Choropleth Layer" in layer.get_name():
+                layer.add_to(map_my)
+            elif isinstance(layer, folium.Layer) and "choropleth" in layer.get_name():
+                layer.add_to(map_my)
 
     st_folium(map_my)
 
