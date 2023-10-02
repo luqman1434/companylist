@@ -12,14 +12,13 @@ import streamlit as st
 import streamlit.components.v1 as components
 from streamlit_folium import st_folium
 
-# 3.16000, 101.71000 : Kuala Lumpur
-
+# Define the function to read the Excel file
 def read_file(filename, sheetname):
     excel_file = pd.ExcelFile(filename)
     data_d = excel_file.parse(sheet_name=sheetname)
-
     return data_d
-    
+
+# Define a function to plot the choropleth
 def plot_choropleth(map_obj, show_choropleth=True):
     if show_choropleth:
         choropleth = folium.Choropleth(
@@ -37,7 +36,8 @@ def plot_choropleth(map_obj, show_choropleth=True):
             highlight=False
         ).add_to(map_obj)
         folium.GeoJsonTooltip(fields=['NAME_1','NAME_2', 'count'], aliases=['State','District', 'Count']).add_to(choropleth.geojson)
-        
+
+# Main part of your code
 if __name__ == '__main__':
     st.title('Available ITP companies in Malaysia')
 
@@ -45,7 +45,7 @@ if __name__ == '__main__':
     geojson_file = "msia_district.geojson"
 
     text_load_state = st.text('Reading files ...')
-    with open(geojson_file, encoding='utf-8', errors='ignore') as gj_f:
+    with open(geojson_file,encoding='utf-8', errors='ignore') as gj_f:
         geojson_data = gpd.read_file(gj_f)
 
     itp_list_state = read_file(file_input, 0)
@@ -68,11 +68,9 @@ if __name__ == '__main__':
 
     threshold_scale = [0, 1, 2, 4, 8, 16, 32, 64, 128, 200, 300, 400] 
 
-    show_choropleth = st.checkbox("Show Choropleth", value=True)
+    # Add a multiselect to allow user to select states
+    selected_states = st.multiselect('Select States', merged_gdf['NAME_1'].unique())
 
-    if show_choropleth:
-        plot_choropleth(map_my)
-        
     text_load_state.text('Plotting ...')
     for itp_data in itp_list_state.to_dict(orient='records'):
         latitude = itp_data['map_latitude']
@@ -81,9 +79,10 @@ if __name__ == '__main__':
         popup_name = '<strong>' + str(itp_data['Company name']) + '</strong>\n' + str(itp_data['Company address'])
         if not math.isnan(latitude) and not math.isnan(longitude):
             folium.Marker(location=[latitude, longitude], popup=popup_name, tooltip=company_name).add_to(map_my)
-    
-    text_load_state.text('Plotting ... Done!')
 
-    map_my.save('itp_area_map.html')
-    p = open('itp_area_map.html')
-    components.html(p.read(), 800, 480)
+    # Filter the data based on selected states
+    if selected_states:
+        filtered_gdf = merged_gdf[merged_gdf['NAME_1'].isin(selected_states)]
+        plot_choropleth(map_my)
+
+    text_load_state.text('Plotting ... Done!')
