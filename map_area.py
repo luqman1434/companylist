@@ -68,15 +68,11 @@ if __name__ == '__main__':
 
     threshold_scale = [0, 1, 2, 4, 8, 16, 32, 64, 128, 200, 300, 400] 
 
-    selected_states = st.multiselect('Select States', merged_gdf['NAME_1'].unique())
-
-    filtered_gdf = merged_gdf[merged_gdf['NAME_1'].isin(selected_states)]
-
     show_choropleth = st.checkbox("Show Choropleth", value=True)
 
-    if show_choropleth and selected_states:
+    if show_choropleth:
         plot_choropleth(map_my)
-
+        
     text_load_state.text('Plotting ...')
     for itp_data in itp_list_state.to_dict(orient='records'):
         latitude = itp_data['map_latitude']
