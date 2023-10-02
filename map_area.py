@@ -19,7 +19,25 @@ def read_file(filename, sheetname):
     data_d = excel_file.parse(sheet_name=sheetname)
 
     return data_d
-
+    
+def plot_choropleth(map_obj, show_choropleth=True):
+    if show_choropleth:
+        choropleth = folium.Choropleth(
+            geo_data=merged_gdf,
+            name='choropleth',
+            data=merged_gdf,
+            columns=['NAME_2', 'count'],
+            key_on='feature.properties.NAME_2',
+            fill_color='RdYlGn',
+            fill_opacity=0.7,
+            line_opacity=0.2,
+            threshold_scale=threshold_scale,
+            line_color='black',
+            legend_name='District Counts',
+            highlight=False
+        ).add_to(map_obj)
+        folium.GeoJsonTooltip(fields=['NAME_1','NAME_2', 'count'], aliases=['State','District', 'Count']).add_to(choropleth.geojson)
+        
 if __name__ == '__main__':
     st.title('Available ITP companies in Malaysia')
 
@@ -50,22 +68,10 @@ if __name__ == '__main__':
 
     threshold_scale = [0, 1, 2, 4, 8, 16, 32, 64, 128, 200, 300, 400] 
 
-    choropleth = folium.Choropleth(
-        geo_data=merged_gdf,
-        name='choropleth',
-        data=merged_gdf,
-        columns=['NAME_2', 'count'],
-        key_on='feature.properties.NAME_2',
-        fill_color='RdYlGn',
-        fill_opacity=0.7,
-        line_opacity=0.2,
-        threshold_scale=threshold_scale,
-        line_color='black',
-        legend_name='District Counts',
-        highlight=False  # Disable the darkened coloration when hovering
-    ).add_to(map_my)
-
-    folium.GeoJsonTooltip(fields=['NAME_1','NAME_2', 'count'], aliases=['State','District', 'Count']).add_to(choropleth.geojson)
+    show_choropleth = st.checkbox("Show Choropleth", value=True)
+    
+    if show_choropleth:
+      plot_choropleth(map_my)
 
     text_load_state.text('Plotting ...')
     for itp_data in itp_list_state.to_dict(orient='records'):
@@ -77,27 +83,6 @@ if __name__ == '__main__':
             folium.Marker(location=[latitude, longitude], popup=popup_name, tooltip=company_name).add_to(map_my)
     
     text_load_state.text('Plotting ... Done!')
-
-    # Manually specify the states for checkboxes
-    #selected_states = st.multiselect("Select States", merged_gdf['NAME_1'].unique())
-
-    #####if selected_states:
-     #   merged_gdf = merged_gdf[merged_gdf['NAME_1'].isin(selected_states)
-    show_choropleth = st.checkbox("Toggle Choropleth Layer")
-
-    ##if not show_choropleth:
-        #choropleth.layer_name = None
-
-    if not show_choropleth:
-        for layer in map_my._children:
-            if isinstance(layer, folium.Map) and layer.get_name() == 'choropleth':
-                layer.add_child(folium.Popup("Click me to toggle the Choropleth Layer", show=True))
-            elif isinstance(layer, folium.Popup) and "Click me to toggle the Choropleth Layer" in layer.get_name():
-                layer.add_to(map_my)
-            elif isinstance(layer, folium.Layer) and "choropleth" in layer.get_name():
-                layer.add_to(map_my)
-
-    st_folium(map_my)
 
     map_my.save('itp_area_map.html')
     p = open('itp_area_map.html')
