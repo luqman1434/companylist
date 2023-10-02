@@ -83,7 +83,7 @@ if __name__ == '__main__':
 
     #####if selected_states:
      #   merged_gdf = merged_gdf[merged_gdf['NAME_1'].isin(selected_states)
-    #show_choropleth = st.checkbox("Toggle Choropleth Layer")
+    show_choropleth = st.checkbox("Toggle Choropleth Layer")
 
     ##if not show_choropleth:
         #choropleth.layer_name = None
