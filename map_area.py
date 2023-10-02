@@ -86,3 +86,7 @@ if __name__ == '__main__':
         plot_choropleth(map_my)
 
     text_load_state.text('Plotting ... Done!')
+
+    map_my.save('itp_area_map.html')
+    p = open('itp_area_map.html')
+    components.html(p.read(), 800, 480)
