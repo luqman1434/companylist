@@ -79,7 +79,7 @@ if __name__ == '__main__':
     text_load_state.text('Plotting ... Done!')
 
     # Manually specify the states for checkboxes
-    selected_states = st.multiselect("Select States", merged_gdf['NAME_1'].unique())
+    #selected_states = st.multiselect("Select States", merged_gdf['NAME_1'].unique())
 
     #####if selected_states:
      #   merged_gdf = merged_gdf[merged_gdf['NAME_1'].isin(selected_states)
