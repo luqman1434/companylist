@@ -72,15 +72,15 @@ if __name__ == '__main__':
     selected_states = st.multiselect("Select States", geojson_data['NAME_1'].unique())
 
     # Filter the data based on selected states
-    filtered_gdf = merged_gdf[merged_gdf['NAME_1'].isin(selected_states)]
+    filtered_data = itp_list_state[itp_list_state['State'].isin(selected_states)]
 
     show_choropleth = st.checkbox("Show Choropleth", value=True)
 
     if show_choropleth:
-        plot_choropleth(map_my, filtered_gdf)
+        plot_choropleth(map_my, merged_gdf)
 
     text_load_state.text('Plotting ...')
-    for itp_data in itp_list_state.to_dict(orient='records'):
+    for itp_data in filtered_data.to_dict(orient='records'):
         latitude = itp_data['map_latitude']
         longitude = itp_data['map_longitude']
         company_name = itp_data['Company name']
