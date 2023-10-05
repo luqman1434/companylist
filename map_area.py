@@ -19,12 +19,12 @@ def read_file(filename, sheetname):
     return data_d
 
 # Define a function to plot the choropleth
-def plot_choropleth(map_obj, show_choropleth=True):
+def plot_choropleth(map_obj, geo_data, show_choropleth=True):
     if show_choropleth:
         choropleth = folium.Choropleth(
-            geo_data=merged_gdf,
+            geo_data=geo_data,
             name='choropleth',
-            data=merged_gdf,
+            data=geo_data,
             columns=['NAME_2', 'count'],
             key_on='feature.properties.NAME_2',
             fill_color='RdYlGn',
@@ -67,9 +67,17 @@ if __name__ == '__main__':
     merged_gdf['count'].fillna(0, inplace=True)
 
     threshold_scale = [0, 1, 2, 4, 8, 16, 32, 64, 128, 200, 300, 400] 
+    
+    # Add a multiselect widget to select states
+    selected_states = st.multiselect("Select States", geojson_data['NAME_1'].unique())
 
-    # Add a multiselect to allow user to select states
-    selected_states = st.multiselect('Select States', merged_gdf['NAME_1'].unique())
+    # Filter the data based on selected states
+    filtered_gdf = merged_gdf[merged_gdf['NAME_1'].isin(selected_states)]
+
+    show_choropleth = st.checkbox("Show Choropleth", value=True)
+
+    if show_choropleth:
+        plot_choropleth(map_my, filtered_gdf)
 
     text_load_state.text('Plotting ...')
     for itp_data in itp_list_state.to_dict(orient='records'):
@@ -79,12 +87,7 @@ if __name__ == '__main__':
         popup_name = '<strong>' + str(itp_data['Company name']) + '</strong>\n' + str(itp_data['Company address'])
         if not math.isnan(latitude) and not math.isnan(longitude):
             folium.Marker(location=[latitude, longitude], popup=popup_name, tooltip=company_name).add_to(map_my)
-
-    # Filter the data based on selected states
-    if selected_states:
-        filtered_gdf = merged_gdf[merged_gdf['NAME_1'].isin(selected_states)]
-        plot_choropleth(map_my)
-
+    
     text_load_state.text('Plotting ... Done!')
 
     map_my.save('itp_area_map.html')
