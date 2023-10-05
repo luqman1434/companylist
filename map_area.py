@@ -1,4 +1,3 @@
-# NO CHORPPL;ETH
 import math
 import json
 import warnings
@@ -43,13 +42,11 @@ if __name__ == '__main__':
     itp_list_state['geometry'] = itp_list_state.apply(lambda x: Point(x['map_longitude'], x['map_latitude']), axis=1)
     itp_list_state = gpd.GeoDataFrame(itp_list_state, geometry='geometry')
 
-    # Add a sidebar for user input
-    selected_states = st.multiselect('FILTER ITP COMPANIES BY STATES',itp_list_state['STATE'].unique())
+    # Remove the sidebar and data filtering code
+    selected_states = st.sidebar.multiselect('Select States', geojson_data['NAME_1'].unique())
+    filtered_data = itp_list_state[itp_list_state['State'].isin(selected_states)]
 
-    # Filter the data based on selected states
-    filtered_data = itp_list_state[itp_list_state['STATE'].isin(selected_states)]
-
-    joined_data = gpd.sjoin(geojson_data, filtered_data, op="contains").groupby(["NAME_1", "NAME_2"]).size().reset_index(name="count")
+    joined_data = gpd.sjoin(geojson_data, itp_list_state, op="contains").groupby(["NAME_1", "NAME_2"]).size().reset_index(name="count")
 
     merged_gdf = geojson_data.merge(joined_data, on=["NAME_1", "NAME_2"], how="left")
     merged_gdf['count'].fillna(0, inplace=True)
@@ -57,7 +54,7 @@ if __name__ == '__main__':
     threshold_scale = [0, 1, 2, 4, 8, 16, 32, 64, 128, 200, 300, 400] 
 
     text_load_state.text('Plotting ...')
-    for itp_data in filtered_data.to_dict(orient='records'):
+    for itp_data in itp_list_state.to_dict(orient='records'):
         latitude = itp_data['map_latitude']
         longitude = itp_data['map_longitude']
         company_name = itp_data['Company name']
