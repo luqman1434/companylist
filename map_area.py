@@ -19,6 +19,24 @@ def read_file(filename, sheetname):
     data_d = excel_file.parse(sheet_name=sheetname)
     return data_d
 
+def plot_choropleth(map_obj, show_choropleth=True):
+    if show_choropleth:
+        choropleth = folium.Choropleth(
+            geo_data=merged_gdf,
+            name='choropleth',
+            data=merged_gdf,
+            columns=['NAME_2', 'count'],
+            key_on='feature.properties.NAME_2',
+            fill_color='RdYlGn',
+            fill_opacity=0.7,
+            line_opacity=0.2,
+            threshold_scale=threshold_scale,
+            line_color='black',
+            legend_name='District Counts',
+            highlight=False
+        ).add_to(map_obj)
+        folium.GeoJsonTooltip(fields=['NAME_1','NAME_2', 'count'], aliases=['State','District', 'Count']).add_to(choropleth.geojson)
+
 # Main part of your code
 if __name__ == '__main__':
     st.title('Available ITP companies in Malaysia')
@@ -66,6 +84,10 @@ if __name__ == '__main__':
             folium.Marker(location=[latitude, longitude], popup=popup_name, tooltip=company_name).add_to(map_my)
     
     text_load_state.text('Plotting ... Done!')
+    
+    show_choropleth = st.checkbox("Show Choropleth", value=False)
+    if show_choropleth:
+        plot_choropleth(map_my)
 
     map_my.save('itp_area_map.html')
     p = open('itp_area_map.html')
