@@ -1,4 +1,3 @@
-#NO CHORPPL;ETH
 import math
 import json
 import warnings
@@ -19,6 +18,25 @@ def read_file(filename, sheetname):
     data_d = excel_file.parse(sheet_name=sheetname)
     return data_d
 
+# Define a function to plot the choropleth
+def plot_choropleth(map_obj, show_choropleth=True):
+    if show_choropleth:
+        choropleth = folium.Choropleth(
+            geo_data=merged_gdf,
+            name='choropleth',
+            data=merged_gdf,
+            columns=['NAME_2', 'count'],
+            key_on='feature.properties.NAME_2',
+            fill_color='RdYlGn',
+            fill_opacity=0.7,
+            line_opacity=0.2,
+            threshold_scale=threshold_scale,
+            line_color='black',
+            legend_name='District Counts',
+            highlight=False
+        ).add_to(map_obj)
+        folium.GeoJsonTooltip(fields=['NAME_1','NAME_2', 'count'], aliases=['State','District', 'Count']).add_to(choropleth.geojson)
+
 # Main part of your code
 if __name__ == '__main__':
     st.title('Available ITP companies in Malaysia')
@@ -27,7 +45,7 @@ if __name__ == '__main__':
     geojson_file = "msia_district.geojson"
 
     text_load_state = st.text('Reading files ...')
-    with open(geojson_file, encoding='utf-8', errors='ignore') as gj_f:
+    with open(geojson_file,encoding='utf-8', errors='ignore') as gj_f:
         geojson_data = gpd.read_file(gj_f)
 
     itp_list_state = read_file(file_input, 0)
@@ -39,7 +57,7 @@ if __name__ == '__main__':
 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-
+    
     itp_list_state['geometry'] = itp_list_state.apply(lambda x: Point(x['map_longitude'], x['map_latitude']), axis=1)
     itp_list_state = gpd.GeoDataFrame(itp_list_state, geometry='geometry')
 
@@ -49,6 +67,11 @@ if __name__ == '__main__':
     merged_gdf['count'].fillna(0, inplace=True)
 
     threshold_scale = [0, 1, 2, 4, 8, 16, 32, 64, 128, 200, 300, 400] 
+    
+    show_choropleth = st.checkbox("Show Choropleth", value=True)
+
+    if show_choropleth:
+        plot_choropleth(map_my)
 
     text_load_state.text('Plotting ...')
     for itp_data in itp_list_state.to_dict(orient='records'):
