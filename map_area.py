@@ -47,7 +47,7 @@ if __name__ == '__main__':
     selected_states = st.sidebar.multiselect('Select States', geojson_data['NAME_1'].unique())
 
     # Filter the data based on selected states
-    filtered_data = itp_list_state[itp_list_state['State'].isin(selected_states)]
+    filtered_data = itp_list_state[itp_list_state['STATE'].isin(selected_states)]
 
     joined_data = gpd.sjoin(geojson_data, filtered_data, op="contains").groupby(["NAME_1", "NAME_2"]).size().reset_index(name="count")
 
