@@ -44,7 +44,7 @@ if __name__ == '__main__':
     itp_list_state = gpd.GeoDataFrame(itp_list_state, geometry='geometry')
 
     # Add a sidebar for user input
-    selected_states = st.multiselect('Select States',itp_list_state['STATE'].unique())
+    selected_states = st.multiselect('FILTER ITP COMPANIES BY STATES',itp_list_state['STATE'].unique())
 
     # Filter the data based on selected states
     filtered_data = itp_list_state[itp_list_state['STATE'].isin(selected_states)]
