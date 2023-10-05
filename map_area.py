@@ -19,10 +19,6 @@ def read_file(filename, sheetname):
     data_d = excel_file.parse(sheet_name=sheetname)
     return data_d
 
-# Define the function to filter the ITP list by selected states
-def filter_by_states(itp_data, selected_states):
-    return itp_data[itp_data['NAME_1'].isin(selected_states)]
-
 # Main part of your code
 if __name__ == '__main__':
     st.title('Available ITP companies in Malaysia')
@@ -37,8 +33,11 @@ if __name__ == '__main__':
     itp_list_state = read_file(file_input, 0)
     text_load_state.text('Reading files ... Done!') 
 
+    # Get unique states from the Excel file
+    unique_states = itp_list_state['STATE'].unique()
+
     # Add a checkbox to allow user to select states
-    selected_states = st.multiselect('Select States', geojson_data['NAME_1'].unique())
+    selected_states = st.multiselect('Select States', unique_states)
 
     map_size = Figure(width=800, height=600)
     map_my = folium.Map(location=[4.2105, 108.9758], zoom_start=6)
@@ -51,14 +50,7 @@ if __name__ == '__main__':
     itp_list_state = gpd.GeoDataFrame(itp_list_state, geometry='geometry')
 
     # Filter ITP data by selected states
-    itp_list_state_filtered = itp_list_state[itp_list_state['NAME_1'].isin(selected_states)]
-
-    # Count the number of companies in each district
-    count_data = itp_list_state_filtered.groupby(["NAME_1", "NAME_2"]).size().reset_index(name="count")
-
-    # Merge count data with geojson data
-    merged_gdf = geojson_data.merge(count_data, on=["NAME_1", "NAME_2"], how="left")
-    merged_gdf['count'].fillna(0, inplace=True)
+    itp_list_state_filtered = itp_list_state[itp_list_state['STATE'].isin(selected_states)]
 
     threshold_scale = [0, 1, 2, 4, 8, 16, 32, 64, 128, 200, 300, 400] 
 
