@@ -40,9 +40,6 @@ if __name__ == '__main__':
     # Add a checkbox to allow user to select states
     selected_states = st.multiselect('Select States', geojson_data['NAME_1'].unique())
 
-    # Debugging: Print selected states to check if they are being captured correctly
-    print("Selected States:", selected_states)
-
     map_size = Figure(width=800, height=600)
     map_my = folium.Map(location=[4.2105, 108.9758], zoom_start=6)
     map_size.add_child(map_my)
@@ -53,21 +50,19 @@ if __name__ == '__main__':
     itp_list_state['geometry'] = itp_list_state.apply(lambda x: Point(x['map_longitude'], x['map_latitude']), axis=1)
     itp_list_state = gpd.GeoDataFrame(itp_list_state, geometry='geometry')
 
-    joined_data = gpd.sjoin(geojson_data, itp_list_state, op="contains").groupby(["NAME_1", "NAME_2"]).size().reset_index(name="count")
+    # Filter ITP data by selected states
+    itp_list_state_filtered = itp_list_state[itp_list_state['NAME_1'].isin(selected_states)]
 
-    merged_gdf = geojson_data.merge(joined_data, on=["NAME_1", "NAME_2"], how="left")
+    # Count the number of companies in each district
+    count_data = itp_list_state_filtered.groupby(["NAME_1", "NAME_2"]).size().reset_index(name="count")
+
+    # Merge count data with geojson data
+    merged_gdf = geojson_data.merge(count_data, on=["NAME_1", "NAME_2"], how="left")
     merged_gdf['count'].fillna(0, inplace=True)
 
     threshold_scale = [0, 1, 2, 4, 8, 16, 32, 64, 128, 200, 300, 400] 
 
     text_load_state.text('Plotting ...')
-
-    # Filter ITP data by selected states
-    itp_list_state_filtered = filter_by_states(itp_list_state, selected_states)
-
-    # Debugging: Print filtered data to check if it's correct
-    print("Filtered Data:", itp_list_state_filtered)
-
     for itp_data in itp_list_state_filtered.to_dict(orient='records'):
         latitude = itp_data['map_latitude']
         longitude = itp_data['map_longitude']
