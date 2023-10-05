@@ -51,16 +51,21 @@ if __name__ == '__main__':
     
     show_choropleth = st.checkbox("Show Choropleth", value=True)
 
-    text_load_state.text('Plotting ...')
-    for itp_data in itp_list_state.to_dict(orient='records'):
-        latitude = itp_data['map_latitude']
-        longitude = itp_data['map_longitude']
-        company_name = itp_data['Company name']
-        popup_name = '<strong>' + str(itp_data['Company name']) + '</strong>\n' + str(itp_data['Company address'])
-        if not math.isnan(latitude) and not math.isnan(longitude):
-            folium.Marker(location=[latitude, longitude], popup=popup_name, tooltip=company_name).add_to(map_my)
-    
-    text_load_state.text('Plotting ... Done!')
+    # Multiselect widget for selecting states
+    selected_states = st.multiselect('Select States', geojson_data['NAME_1'].unique())
+
+    if selected_states:
+        text_load_state.text('Plotting ...')
+        for itp_data in itp_list_state.to_dict(orient='records'):
+            if itp_data['NAME_1'] in selected_states:
+                latitude = itp_data['map_latitude']
+                longitude = itp_data['map_longitude']
+                company_name = itp_data['Company name']
+                popup_name = '<strong>' + str(itp_data['Company name']) + '</strong>\n' + str(itp_data['Company address'])
+                if not math.isnan(latitude) and not math.isnan(longitude):
+                    folium.Marker(location=[latitude, longitude], popup=popup_name, tooltip=company_name).add_to(map_my)
+        
+        text_load_state.text('Plotting ... Done!')
 
     map_my.save('itp_area_map.html')
     p = open('itp_area_map.html')
