@@ -40,6 +40,9 @@ if __name__ == '__main__':
     # Add a checkbox to allow user to select states
     selected_states = st.multiselect('Select States', geojson_data['NAME_1'].unique())
 
+    # Debugging: Print selected states to check if they are being captured correctly
+    print("Selected States:", selected_states)
+
     map_size = Figure(width=800, height=600)
     map_my = folium.Map(location=[4.2105, 108.9758], zoom_start=6)
     map_size.add_child(map_my)
@@ -58,7 +61,14 @@ if __name__ == '__main__':
     threshold_scale = [0, 1, 2, 4, 8, 16, 32, 64, 128, 200, 300, 400] 
 
     text_load_state.text('Plotting ...')
-    for itp_data in itp_list_state.to_dict(orient='records'):
+
+    # Filter ITP data by selected states
+    itp_list_state_filtered = filter_by_states(itp_list_state, selected_states)
+
+    # Debugging: Print filtered data to check if it's correct
+    print("Filtered Data:", itp_list_state_filtered)
+
+    for itp_data in itp_list_state_filtered.to_dict(orient='records'):
         latitude = itp_data['map_latitude']
         longitude = itp_data['map_longitude']
         company_name = itp_data['Company name']
