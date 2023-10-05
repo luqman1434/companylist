@@ -1,3 +1,4 @@
+#NO CHORPPL;ETH
 import math
 import json
 import warnings
@@ -18,6 +19,10 @@ def read_file(filename, sheetname):
     data_d = excel_file.parse(sheet_name=sheetname)
     return data_d
 
+# Define the function to filter the ITP list by selected states
+def filter_by_states(itp_data, selected_states):
+    return itp_data[itp_data['NAME_1'].isin(selected_states)]
+
 # Main part of your code
 if __name__ == '__main__':
     st.title('Available ITP companies in Malaysia')
@@ -31,6 +36,9 @@ if __name__ == '__main__':
 
     itp_list_state = read_file(file_input, 0)
     text_load_state.text('Reading files ... Done!') 
+
+    # Add a checkbox to allow user to select states
+    selected_states = st.multiselect('Select States', geojson_data['NAME_1'].unique())
 
     map_size = Figure(width=800, height=600)
     map_my = folium.Map(location=[4.2105, 108.9758], zoom_start=6)
@@ -48,26 +56,17 @@ if __name__ == '__main__':
     merged_gdf['count'].fillna(0, inplace=True)
 
     threshold_scale = [0, 1, 2, 4, 8, 16, 32, 64, 128, 200, 300, 400] 
+
+    text_load_state.text('Plotting ...')
+    for itp_data in itp_list_state.to_dict(orient='records'):
+        latitude = itp_data['map_latitude']
+        longitude = itp_data['map_longitude']
+        company_name = itp_data['Company name']
+        popup_name = '<strong>' + str(itp_data['Company name']) + '</strong>\n' + str(itp_data['Company address'])
+        if not math.isnan(latitude) and not math.isnan(longitude):
+            folium.Marker(location=[latitude, longitude], popup=popup_name, tooltip=company_name).add_to(map_my)
     
-    show_choropleth = st.checkbox("Show Choropleth", value=True)
-
-    # Multiselect widget for selecting states
-    selected_states = geojson_data['NAME_1'].unique().tolist()
-
-    selected_states = st.multiselect('Select States', geojson_data['NAME_1'].unique().tolist(), selected_states)
-
-    if selected_states:
-        text_load_state.text('Plotting ...')
-        for itp_data in itp_list_state.to_dict(orient='records'):
-            if itp_data['NAME_1'] and itp_data['NAME_1'] in selected_states:
-                latitude = itp_data['map_latitude']
-                longitude = itp_data['map_longitude']
-                company_name = itp_data['Company name']
-                popup_name = '<strong>' + str(itp_data['Company name']) + '</strong>\n' + str(itp_data['Company address'])
-                if not math.isnan(latitude) and not math.isnan(longitude):
-                    folium.Marker(location=[latitude, longitude], popup=popup_name, tooltip=company_name).add_to(map_my)
-        
-        text_load_state.text('Plotting ... Done!')
+    text_load_state.text('Plotting ... Done!')
 
     map_my.save('itp_area_map.html')
     p = open('itp_area_map.html')
