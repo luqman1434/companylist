@@ -57,7 +57,7 @@ if __name__ == '__main__':
     if selected_states:
         text_load_state.text('Plotting ...')
         for itp_data in itp_list_state.to_dict(orient='records'):
-            if itp_data['NAME_1'] in selected_states:
+            if itp_data['NAME_1'] and itp_data['NAME_1'] in selected_states:
                 latitude = itp_data['map_latitude']
                 longitude = itp_data['map_longitude']
                 company_name = itp_data['Company name']
