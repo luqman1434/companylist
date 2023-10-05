@@ -24,12 +24,8 @@ if __name__ == '__main__':
     st.title('Available ITP companies in Malaysia')
 
     file_input = 'MMU ITP List 13_9_9_11.xlsx'
-    geojson_file = "msia_district.geojson"
 
     text_load_state = st.text('Reading files ...')
-    with open(geojson_file, encoding='utf-8', errors='ignore') as gj_f:
-        geojson_data = gpd.read_file(gj_f)
-
     itp_list_state = read_file(file_input, 0)
     text_load_state.text('Reading files ... Done!') 
 
