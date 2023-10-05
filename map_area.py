@@ -49,10 +49,12 @@ if __name__ == '__main__':
 
     threshold_scale = [0, 1, 2, 4, 8, 16, 32, 64, 128, 200, 300, 400] 
     
-    #show_choropleth = st.checkbox("Show Choropleth", value=True)
+    show_choropleth = st.checkbox("Show Choropleth", value=True)
 
     # Multiselect widget for selecting states
-    selected_states = st.multiselect('Select States', geojson_data['NAME_1'].unique())
+    selected_states = geojson_data['NAME_1'].unique().tolist()
+
+    selected_states = st.multiselect('Select States', geojson_data['NAME_1'].unique().tolist(), selected_states)
 
     if selected_states:
         text_load_state.text('Plotting ...')
