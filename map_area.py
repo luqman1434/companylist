@@ -59,13 +59,11 @@ if __name__ == '__main__':
     itp_list_state['geometry'] = itp_list_state.apply(lambda x: Point(x['map_longitude'], x['map_latitude']), axis=1)
     itp_list_state = gpd.GeoDataFrame(itp_list_state, geometry='geometry')
 
-    # Add a sidebar for user input
     selected_states = st.multiselect('Select States',itp_list_state['STATE'].unique())
+    
+    #filtered_data = itp_list_state[itp_list_state['STATE'].isin(selected_states)]
 
-    # Filter the data based on selected states
-    filtered_data = itp_list_state[itp_list_state['STATE'].isin(selected_states)]
-
-    joined_data = gpd.sjoin(geojson_data, filtered_data, op="contains").groupby(["NAME_1", "NAME_2"]).size().reset_index(name="count")
+    joined_data = gpd.sjoin(geojson_data, selected_states, op="contains").groupby(["NAME_1", "NAME_2"]).size().reset_index(name="count")
 
     merged_gdf = geojson_data.merge(joined_data, on=["NAME_1", "NAME_2"], how="left")
     merged_gdf['count'].fillna(0, inplace=True)
