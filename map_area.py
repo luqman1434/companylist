@@ -1,4 +1,3 @@
-# NO CHORPPL;ETH
 import math
 import json
 import warnings
@@ -37,7 +36,6 @@ def plot_choropleth(map_obj, show_choropleth=True):
         ).add_to(map_obj)
         folium.GeoJsonTooltip(fields=['NAME_1','NAME_2', 'count'], aliases=['State','District', 'Count']).add_to(choropleth.geojson)
 
-# Main part of your code
 if __name__ == '__main__':
     st.title('Available ITP companies in Malaysia')
 
@@ -62,10 +60,10 @@ if __name__ == '__main__':
     itp_list_state = gpd.GeoDataFrame(itp_list_state, geometry='geometry')
 
     # Add a sidebar for user input
-    selected_states = st.multiselect('FILTER ITP COMPANIES BY STATE',itp_list_state['STATE'].unique())
+    selected_states = st.multiselect('Select States',itp_list_state['STATE'].unique())
 
     # Filter the data based on selected states
-    ###filtered_data = itp_list_state[itp_list_state['STATE'].isin(selected_states)]
+    #filtered_data = itp_list_state[itp_list_state['STATE'].isin(selected_states)]
 
     joined_data = gpd.sjoin(geojson_data, selected_states, op="contains").groupby(["NAME_1", "NAME_2"]).size().reset_index(name="count")
 
